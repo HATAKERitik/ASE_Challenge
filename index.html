@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ASE_Challenge</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background: #f9f9f9; }
+    h1, h2 { text-align: center; }
+    form, .stock-control { margin: 20px 0; padding: 15px; background: #fff; border: 1px solid #ccc; border-radius: 8px; }
+    input, select, button { padding: 8px; margin: 5px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background: #eee; }
+    button { cursor: pointer; }
+    .actions button { margin: 2px; }
+    .message { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  
+  <!-- Add Product Form -->
+  <form id="addProductForm">
+    <h2>Add Product</h2>
+    <input type="text" id="Name" placeholder="Product Name" required>
+    <input type="text" id="Description" placeholder="Description" required>
+    <input type="number" id="stock_quntity" placeholder="Stock Quantity" required>
+    <button type="submit">Add Product</button>
+  </form>
+
+  <h2>All Products</h2>
+  <table id="productsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Stock</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="stock-control">
+    <h2>Increase / Decrease Stock</h2>
+    <select id="productSelect"></select>
+    <input type="number" id="stockAmount" placeholder="Amount" required>
+    <button onclick="increaseStock()">Increase</button>
+    <button onclick="decreaseStock()">Decrease</button>
+    <p class="message" id="stockMessage"></p>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:800/api";
+    const productsTableBody = document.querySelector("#productsTable tbody");
+    const productSelect = document.getElementById("productSelect");
+    const stockMessage = document.getElementById("stockMessage");
+
+    async function fetchProducts() {
+      try {
+        const res = await fetch(`${API_URL}/products`);
+        const data = await res.json();
+        productsTableBody.innerHTML = "";
+        productSelect.innerHTML = "";
+
+        data.Data.forEach(p => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.Name}</td>
+            <td>${p.Description}</td>
+            <td>${p.stock_quntity}</td>
+            <td class="actions">
+              <button onclick="deleteProduct(${p.id})">Delete</button>
+            </td>
+          `;
+          productsTableBody.appendChild(tr);
+
+          const option = document.createElement("option");
+          option.value = p.id;
+          option.textContent = `${p.Name} (Stock: ${p.stock_quntity})`;
+          productSelect.appendChild(option);
+        });
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      }
+    }
+
+    document.getElementById("addProductForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const product = {
+        Name: document.getElementById("Name").value,
+        Description: document.getElementById("Description").value,
+        stock_quntity: parseInt(document.getElementById("stock_quntity").value)
+      };
+      try {
+        await fetch(`${API_URL}/product`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(product)
+        });
+        e.target.reset();
+        fetchProducts();
+      } catch (err) {
+        console.error("Failed to add product:", err);
+      }
+    });
+
+    // Delete Product
+    async function deleteProduct(id) {
+      try {
+        await fetch(`${API_URL}/product/${id}`, { method: "DELETE" });
+        fetchProducts();
+      } catch (err) {
+        console.error("Failed to delete product:", err);
+      }
+    }
+
+    // Increase stock
+    async function increaseStock() {
+      const id = productSelect.value;
+      const amount = parseInt(document.getElementById("stockAmount").value);
+      if (!id || !amount) return;
+      try {
+        const res = await fetch(`${API_URL}/product/increase/${id}/${amount}`, { method: "PUT" });
+        const data = await res.json();
+        stockMessage.textContent = data.Status || "";
+        fetchProducts();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Decrease stock
+    async function decreaseStock() {
+      const id = productSelect.value;
+      const amount = parseInt(document.getElementById("stockAmount").value);
+      if (!id || !amount) return;
+      try {
+        const res = await fetch(`${API_URL}/product/decrease/${id}/${amount}`, { method: "PUT" });
+        const data = await res.json();
+        stockMessage.textContent = data.Status || data.Message || "";
+        fetchProducts();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Initial fetch
+    fetchProducts();
+  </script>
+</body>
+</html>
