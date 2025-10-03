@@ -58,7 +58,7 @@
 
     async function fetchProducts() {
       try {
-        const res = await fetch(`${API_BASE_URL}/products`);
+        const res = await fetch(`${API_BASE_URL}/api/products`);
         const data = await res.json();
         productsTableBody.innerHTML = "";
         productSelect.innerHTML = "";
@@ -94,7 +94,7 @@
         stock_quntity: parseInt(document.getElementById("stock_quntity").value)
       };
       try {
-        await fetch(`${API_URL}/product`, {
+        await fetch(`${API_BASE_URL}/api/product`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(product)
@@ -109,7 +109,7 @@
     // Delete Product
     async function deleteProduct(id) {
       try {
-        await fetch(`${API_URL}/product/${id}`, { method: "DELETE" });
+        await fetch(`${API_BASE_URL}/api/product/${id}`, { method: "DELETE" });
         fetchProducts();
       } catch (err) {
         console.error("Failed to delete product:", err);
@@ -122,7 +122,7 @@
       const amount = parseInt(document.getElementById("stockAmount").value);
       if (!id || !amount) return;
       try {
-        const res = await fetch(`${API_URL}/product/increase/${id}/${amount}`, { method: "PUT" });
+        const res = await fetch(`${API_BASE_URL}/api/product/increase/${id}/${amount}`, { method: "PUT" });
         const data = await res.json();
         stockMessage.textContent = data.Status || "";
         fetchProducts();
@@ -137,7 +137,7 @@
       const amount = parseInt(document.getElementById("stockAmount").value);
       if (!id || !amount) return;
       try {
-        const res = await fetch(`${API_URL}/product/decrease/${id}/${amount}`, { method: "PUT" });
+        const res = await fetch(`${API_BASE_URL}/api/product/decrease/${id}/${amount}`, { method: "PUT" });
         const data = await res.json();
         stockMessage.textContent = data.Status || data.Message || "";
         fetchProducts();
