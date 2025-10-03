@@ -13,11 +13,13 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json());
-app.listen(port , ()=>{
-    console.log(`server is running on port ${port}`);
-})
 
 app.use(express.static("public"));
 app.use("/api", productsRouter);
 
+
+
+app.use(express.json());
+app.listen(port , ()=>{
+    console.log(`server is running on port ${port}`);
+})
