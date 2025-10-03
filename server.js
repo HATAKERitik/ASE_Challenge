@@ -7,7 +7,12 @@ const cors=require("cors");
 const app=express();
 const port =800;
 
-app.use(cors()); 
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://ase-challenge.onrender.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
+
 app.use(express.json());
 app.listen(port , ()=>{
     console.log(`server is running on port ${port}`);
