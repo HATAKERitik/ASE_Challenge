@@ -1,10 +1,14 @@
-# Product Inventory Management API 📦
+# ASE Challenge Backend INVENTORY MANAGEMENT API 📦
 
 This is a RESTful API designed for managing product inventory, providing standard CRUD (Create, Read, Update, Delete) operations, and specific endpoints for stock quantity management.
+**Also created on HTML file in there where you can check all the API Working in simple frontend just in Rootdirectory/Public/index.html**
 
 It's built with **Node.js**, **Express.js**, and uses **Prisma** as the Object-Relational Mapper (ORM) for interacting with the database.
 
 ---
+## Steps to install the run the API 
+1. *npm install*
+2. *npm start*
 
 ## Prerequisites
 
@@ -13,6 +17,7 @@ Before running this API, ensure you have:
 * **Node.js** and **npm** installed.
 * A database configured and accessible by **Prisma**.
 * The Prisma client generated (`npx prisma generate`).
+
 
 ---
 
